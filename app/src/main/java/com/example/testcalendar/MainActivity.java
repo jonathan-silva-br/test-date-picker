@@ -11,11 +11,11 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     Calendar calendar;
-    DatePickerDialog datePickerDialog;
     TextView textCalendar;
 
     @Override
@@ -23,34 +23,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date data = new Date();
-
-        String dataFormatada = dateFormat.format(data);
-
         textCalendar = findViewById(R.id.textCalendar);
-        textCalendar.setText(dataFormatada);
+
+        calendar = Calendar.getInstance();
+
+        updateLabel();
+
+        final DatePickerDialog.OnDateSetListener date = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                calendar.set(Calendar.YEAR, year);
+                calendar.set(Calendar.MONTH, month);
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                updateLabel();
+            }
+        };
 
         textCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                calendar = Calendar.getInstance();
-                int dia = calendar.get(Calendar.DAY_OF_MONTH);
-                int mes = calendar.get(Calendar.MONTH);
-                int ano = calendar.get(Calendar.YEAR);
-
-                datePickerDialog = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker datePicker, int ano, int mes, int dia) {
-                        textCalendar.setText(dia + "/" + mes + "/" + ano);
-                    }
-                }, dia, mes, ano);
-                datePickerDialog.show();
-
+                new DatePickerDialog(MainActivity.this, date, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
-
-
     }
+
+    private void updateLabel() {
+        String myFormat = "dd/MM/yyyy";
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, new Locale("pt","BR"));
+        textCalendar.setText(sdf.format(calendar.getTime()));
+    }
+
 }
